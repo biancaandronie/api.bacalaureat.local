@@ -82,7 +82,7 @@ function addVideo($request,$response) {
         $uploadedFiles = $request->getUploadedFiles();
 
         // handle single input with single file upload
-        $uploadedFile = $uploadedFiles['video'];
+        $uploadedFile = $uploadedFiles['file'];
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = moveUploadedFile($directory, $uploadedFile);
             $response->write('uploaded ' . $filename . '<br/>');
