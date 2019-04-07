@@ -10,7 +10,7 @@ $video_host = "http://bacalaureat.local";
 
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
-$container['upload_directory'] = __DIR__ . '/uploads';
+$container['upload_directory'] = __DIR__ . '/videos';
 $app = new \Slim\App($settings);
 $corsOptions = array(
     "origin" => "*",
@@ -27,7 +27,7 @@ require __DIR__ . '/../src/dependencies.php';
 require __DIR__ . '/../src/routes.php';
 
 // Run app
-$app->run();
+
 
 function getVideos($request,$response) {
     $sql = "select * FROM videos";
@@ -54,7 +54,7 @@ function getVideo($request) {
         $sth->bindParam("id", $args['id']);
         $sth->execute();
         $todos = $sth->fetchObject();
-        return json_encode($todos);
+        return $response->withJson($emp,200)->write();
     }
     catch(PDOException $e) {
       echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -76,17 +76,17 @@ function addVideo($request,$response) {
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
-        return $response->withJson($emp,200)->write("Video successfully added");
-//        $directory = $this->get('upload_directory');
-//
-//        $uploadedFiles = $request->getUploadedFiles();
-//
-//        // handle single input with single file upload
-//        $uploadedFile = $uploadedFiles[$emp->name];
-//        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-//            $filename = moveUploadedFile($directory, $uploadedFile);
-//            $response->write('uploaded ' . $filename . '<br/>');
-//        }
+        return $response->withJson($emp,200)->write();
+        $directory = $this->get('upload_directory');
+
+        $uploadedFiles = $request->getUploadedFiles();
+
+        // handle single input with single file upload
+        $uploadedFile = $uploadedFiles['video'];
+        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+            $filename = moveUploadedFile($directory, $uploadedFile);
+            $response->write('uploaded ' . $filename . '<br/>');
+        }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
@@ -109,7 +109,7 @@ function updateVideo($request) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
-        echo json_encode($emp);
+        return $response->withJson($emp,200)->write();
     }
     catch(PDOException $e) {
        echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -131,3 +131,4 @@ function deleteVideo($request) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
+$app->run();
