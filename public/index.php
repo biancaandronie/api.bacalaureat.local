@@ -60,6 +60,7 @@ function getVideo($request) {
       echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
+
 function addVideo($request,$response) {
     global  $video_host;
     $emp = json_decode($request->getBody());
@@ -130,4 +131,16 @@ function deleteVideo($request) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
+
+function moveUploadedFile($directory, UploadedFile $uploadedFile)
+{
+    $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+    $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
+    $filename = sprintf('%s.%0.8s', $basename, $extension);
+
+    $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
+
+    return $filename;
+}
+
 $app->run();
