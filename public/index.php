@@ -76,17 +76,16 @@ function addVideo($request,$response) {
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
-        return $response->withJson($emp,200)->write();
         $directory = $this->get('upload_directory');
 
         $uploadedFiles = $request->getUploadedFiles();
-
         // handle single input with single file upload
         $uploadedFile = $uploadedFiles['file'];
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = moveUploadedFile($directory, $uploadedFile);
             $response->write('uploaded ' . $filename . '<br/>');
         }
+        return $response->withJson($emp,200)->write();
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
