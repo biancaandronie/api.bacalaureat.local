@@ -10,10 +10,10 @@ $video_host = "http://bacalaureat.local";
 
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
-$container['upload_directory'] = __DIR__ . '/videos';
 $app = new \Slim\App($settings);
 $corsOptions = array(
     "origin" => "*",
+    "Access-Control-Allow-Origin" => "*",
     "exposeHeaders" => array("Content-Type", "X-Requested-With", "X-authentication", "X-client"),
     "allowMethods" => array('GET', 'POST', 'PUT', 'DELETE', 'OPTIONS')
 );
@@ -26,7 +26,6 @@ require __DIR__ . '/../src/dependencies.php';
 // Register routes
 require __DIR__ . '/../src/routes.php';
 
-// Run app
 
 
 function getVideos($request,$response) {
@@ -54,13 +53,12 @@ function getVideo($request) {
         $sth->bindParam("id", $args['id']);
         $sth->execute();
         $todos = $sth->fetchObject();
-        return $response->withJson($emp,200)->write();
+        return json_encode($todos);
     }
     catch(PDOException $e) {
       echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
-
 function addVideo($request,$response) {
     global  $video_host;
     $emp = json_decode($request->getBody());
@@ -72,24 +70,34 @@ function addVideo($request,$response) {
         $stmt->bindParam("name", $emp->name);
         $stmt->bindParam("course", $emp->course);
         $stmt->bindParam("link", $video_link);
-        $stmt->bindParam("tag", implode(" ",$emp->tag));
+        $stmt->bindParam("tag", $emp->tag);
         $stmt->bindParam("date", date("Y-m-d H:i:s"));
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
-        $directory = $this->get('upload_directory');
-
-        $uploadedFiles = $request->getUploadedFiles();
-        // handle single input with single file upload
-        $uploadedFile = $uploadedFiles['file'];
-        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-            $filename = moveUploadedFile($directory, $uploadedFile);
-            $response->write('uploaded ' . $filename . '<br/>');
-        }
-        return $response->withJson($emp,200)->write();
+        return $response->withJson($emp,200)->write("Video successfully added");
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
+}
+
+function addVideoFile($request,$response){
+    $container['upload_directory'] = __DIR__ . '/videos';
+    $directory = $container['upload_directory'];
+    $uploadedFiles = $request->getUploadedFiles();
+
+    if (empty($uploadedFiles['newfile'])) {
+        throw new \RuntimeException('Expected a newfile');
+    }
+
+    // handle single input with single file upload
+    $uploadedFile = $uploadedFiles['newfile'];
+    if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+        $filename = moveUploadedFile($directory, $uploadedFile);
+        $response->write('uploaded ' . $filename . '<br/>');
+        return $filename;
+    }
+
 }
 
 function updateVideo($request) {
@@ -109,7 +117,7 @@ function updateVideo($request) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
-        return $response->withJson($emp,200)->write();
+        echo json_encode($emp);
     }
     catch(PDOException $e) {
        echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -143,4 +151,6 @@ function moveUploadedFile($directory, UploadedFile $uploadedFile)
     return $filename;
 }
 
+// Run app
 $app->run();
+

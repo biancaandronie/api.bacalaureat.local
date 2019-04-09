@@ -8,6 +8,7 @@ $app->group('/api', function () use ($app) {
 		$app->get('/videos', 'getVideos');
 		$app->get('/video/{id}', 'getVideo');
 		$app->post('/create', 'addVideo');
+		$app->post('/upload', 'addVideoFile');
 		$app->put('/update/{id}', 'updateVideo');
 		$app->delete('/delete/{id}', 'deleteVideo');
 	});
