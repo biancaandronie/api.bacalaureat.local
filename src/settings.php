@@ -5,13 +5,9 @@ session_start();
 
 /* DATABASE CONFIGURATION */
 define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_USERNAME', 'bianca');
+define('DB_PASSWORD', 'test123');
 define('DB_DATABASE', 'bacalaureat');
-define("BASE_URL", "http://api.bacalaureat.local/api/");
-define("SITE_KEY", 'sesiunebacalaureat');
-
-
 
 function getConnection()
 {
