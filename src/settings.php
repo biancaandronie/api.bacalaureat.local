@@ -40,8 +40,8 @@ return [
 
         // Monolog settings
         'logger' => [
-            'name' => 'slim-app',
-            'path' => __DIR__ . '/../logs/app.log',
+            'name' => 'video-api',
+            'path' => '../logs/app.log',
             'level' => \Monolog\Logger::DEBUG,
         ],
     ],
