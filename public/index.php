@@ -88,7 +88,8 @@ function addVideoFile($request,$response){
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->execute();
-        $name = $stmt->fetch();
+        $list = $stmt->fetch();
+        $name = $list['name'];
 
     }
     catch(PDOException $e) {
