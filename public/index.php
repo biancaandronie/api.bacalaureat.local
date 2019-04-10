@@ -75,7 +75,7 @@ function addVideo($request,$response) {
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
-        return $response->withJson($emp."\n",200)->write("Video successfully added");
+        return $response->withJson($emp,200)->write("Video successfully added");
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
