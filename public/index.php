@@ -62,7 +62,7 @@ function getVideo($request) {
 function addVideo($request,$response) {
     global  $video_host;
     $emp = json_decode($request->getBody());
-    $video_link = $video_host . "/".$emp->name;
+    $video_link = $video_host . "/videos/".$emp->name;
     $sql = "INSERT INTO videos (name, course, link, tag, date) VALUES (:name,:course,:link,:tag,:date)";
     try {
         $db = getConnection();
