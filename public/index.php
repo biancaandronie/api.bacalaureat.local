@@ -89,6 +89,10 @@ function addVideoFile($request,$response){
         $stmt = $db->prepare($sql);
         $stmt->bindParam("name", $name);
         $stmt->execute();
+    }
+    catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
     $uploadedFiles = $request->getUploadedFiles();
 
     if (empty($uploadedFiles['newfile'])) {
