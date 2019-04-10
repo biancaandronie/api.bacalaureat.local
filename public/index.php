@@ -95,7 +95,6 @@ function addVideoFile($request,$response){
     if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
         $filename = moveUploadedFile($directory, $uploadedFile);
         $response->write('uploaded ' . $filename . '<br/>');
-        return $filename;
     }
 
 }
