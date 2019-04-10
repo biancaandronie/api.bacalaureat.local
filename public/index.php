@@ -1,8 +1,8 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
-use Slim\Http\Request;
-use Slim\Http\Response;
+//use Slim\Http\Request;
+//use Slim\Http\Response;
 use Slim\Http\UploadedFile;
 
 session_start();
@@ -75,15 +75,20 @@ function addVideo($request,$response) {
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
-        return $response->withJson($emp,200)->write("Video successfully added");
+        return $response->withJson($emp."\n",200)->write("Video successfully added");
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
 
 function addVideoFile($request,$response){
-    $container['upload_directory'] = __DIR__ . '/videos';
-    $directory = $container['upload_directory'];
+    $directory = __DIR__ . '/videos';
+    $sql = "SELECT name FROM videos ORDER BY id DESC LIMIT 1";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("name", $name);
+        $stmt->execute();
     $uploadedFiles = $request->getUploadedFiles();
 
     if (empty($uploadedFiles['newfile'])) {
@@ -93,7 +98,7 @@ function addVideoFile($request,$response){
     // handle single input with single file upload
     $uploadedFile = $uploadedFiles['newfile'];
     if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-        $filename = moveUploadedFile($directory, $uploadedFile);
+        $filename = moveUploadedFile($name,$directory, $uploadedFile);
         $response->write('uploaded ' . $filename . '<br/>');
     }
 
@@ -139,10 +144,10 @@ function deleteVideo($request) {
     }
 }
 
-function moveUploadedFile($directory, UploadedFile $uploadedFile)
+function moveUploadedFile($basename, $directory, UploadedFile $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
-    $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
+    //$basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
     $filename = sprintf('%s.%0.8s', $basename, $extension);
 
     $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
