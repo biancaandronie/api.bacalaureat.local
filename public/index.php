@@ -98,35 +98,6 @@ function addVideo($request,$response) {
     }
 }
 
-function addVideoFile($request,$response){
-    $directory = __DIR__ . '/videos';
-    $sql = "SELECT name FROM videos ORDER BY id DESC LIMIT 1";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-        $list = $stmt->fetch();
-        $name = $list['name'];
-        $uploadedFiles = $request->getUploadedFiles();
-
-        if (empty($uploadedFiles['newfile'])) {
-            throw new \RuntimeException('Expected a newfile');
-        }
-
-        // handle single input with single file upload
-        $uploadedFile = $uploadedFiles['newfile'];
-        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-            $filename = moveUploadedFile($name,$directory, $uploadedFile);
-            $response->write('uploaded ' . $filename . '<br/>');
-        }
-    }
-    catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
-
-
-}
-
 function updateVideo($request) {
     global  $video_host;
     $emp = json_decode($request->getBody());
