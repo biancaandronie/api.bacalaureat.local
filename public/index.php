@@ -1,10 +1,11 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
+//require '../vendor/autoload.php';
 //use Slim\Http\Request;
 //use Slim\Http\Response;
 use Slim\Http\UploadedFile;
-
+//$app->log->setEnabled(true);
 session_start();
 $video_host = "http://bacalaureat.local";
 
@@ -62,19 +63,35 @@ function getVideo($request) {
 function addVideo($request,$response) {
     global  $video_host;
     $emp = json_decode($request->getBody());
-    $video_link = $video_host . "/videos/".$emp->name.'.mp4';
+    $name = $request->getParsedBodyParam('name');
+    $course = $request->getParsedBodyParam('course');
+    $tag = $request->getParsedBodyParam('tag');
+    $description = $request->getParsedBodyParam('description');
     $sql = "INSERT INTO videos (name, course, link, tag, date) VALUES (:name,:course,:link,:tag,:date)";
     try {
+    	$directory = __DIR__ . '/videos';
+        $uploadedFiles = $request->getUploadedFiles();
+        if (empty($uploadedFiles['videofile'])) {
+            throw new \RuntimeException('Expected a videofile');
+        }
+        $uploadedFile = $uploadedFiles['videofile'];
+        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+            $filename = moveUploadedFile($name,$directory, $uploadedFile);
+            $response->write('uploaded ' . $filename . '<br/>');
+	}
+    	$video_link = $video_host . "/videos/".$filename;
         $db = getConnection();
         $stmt = $db->prepare($sql);
-        $stmt->bindParam("name", $emp->name);
-        $stmt->bindParam("course", $emp->course);
+        $stmt->bindParam("name", $name);
+        $stmt->bindParam("course", $course);
         $stmt->bindParam("link", $video_link);
-        $stmt->bindParam("tag", $emp->tag);
+        $stmt->bindParam("tag", $tag);
+//        $stmt->bindParam("description", $description);
         $stmt->bindParam("date", date("Y-m-d H:i:s"));
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
+        // handle single input with single file upload
         return $response->withJson($emp,200)->write("Video successfully added");
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -163,4 +180,4 @@ function moveUploadedFile($basename, $directory, UploadedFile $uploadedFile)
 
 // Run app
 $app->run();
-
+?>
