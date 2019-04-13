@@ -12,3 +12,7 @@ $app->group('/api', function () use ($app) {
 		$app->delete('/delete/{id}', 'deleteVideo');
 	});
 });
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+    $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+    return $handler($req, $res);
+});

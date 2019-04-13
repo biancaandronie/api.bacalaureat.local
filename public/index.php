@@ -1,31 +1,23 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
-//require '../vendor/autoload.php';
-//use Slim\Http\Request;
-//use Slim\Http\Response;
 use Slim\Http\UploadedFile;
-//$app->log->setEnabled(true);
+
 session_start();
 $video_host = "http://bacalaureat.local";
 
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
 $app = new \Slim\App($settings);
-$corsOptions = array(
-    "origin" => "*",
-    "Access-Control-Allow-Origin" => "*",
-    "exposeHeaders" => array("Content-Type", "X-Requested-With", "X-authentication", "X-client"),
-    "allowMethods" => array('GET', 'POST', 'PUT', 'DELETE', 'OPTIONS')
-);
-$cors = new \CorsSlim\CorsSlim($corsOptions);
 
-$app->add($cors);
 // Set up dependencies
 require __DIR__ . '/../src/dependencies.php';
 
 // Register routes
 require __DIR__ . '/../src/routes.php';
+
+//setup middleware
+require __DIR__ . '/../src/middleware.php';
 
 
 
@@ -138,11 +130,11 @@ function deleteVideo($request) {
     }
 }
 
-function moveUploadedFile($basename, $directory, UploadedFile $uploadedFile)
+function moveUploadedFile($name,$directory, UploadedFile $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
-    //$basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
-    $filename = sprintf('%s.%0.8s', $basename, $extension);
+    $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
+    $filename = sprintf('%s.%0.8s', $name, $extension);
 
     $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
 
@@ -151,4 +143,4 @@ function moveUploadedFile($basename, $directory, UploadedFile $uploadedFile)
 
 // Run app
 $app->run();
-?>
+
