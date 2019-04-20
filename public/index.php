@@ -4,7 +4,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Http\UploadedFile;
 
 session_start();
-$video_host = "http://bacalaureat.local";
 
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
@@ -34,26 +33,53 @@ function getVideos($request,$response) {
     }
 }
 
-function getVideo($request) {
-    //$id = 0;;
-    $id =  $request->getAttribute('id');
-    if(empty($id)) {
-        echo '{"error":{"text":"Id is empty"}}';
-    }
+function getVideo($request,$response) {
+    $emp = json_decode($request->getBody());
+    $name = "$emp->name%";
+    $sql = "SELECT *  FROM videos WHERE name LIKE :name";
     try {
-        $db = getConnection();
-        $sth = $db->prepare("SELECT * FROM videos WHERE id=$id");
-        $sth->bindParam("id", $args['id']);
-        $sth->execute();
-        $todos = $sth->fetchObject();
-        return json_encode($todos);
+        if (!empty($emp->name)) {
+            $db = getConnection();
+            $sth = $db->prepare($sql);
+            $sth->bindParam("name", $name);
+            $sth->execute();
+            $todos = $sth->fetchAll(PDO::FETCH_OBJ);
+            return $response->withJson($todos, 200)->write();
+        }
+        else{
+            return $response->withJson("The name parameter is empty",401)->write();
+        }
     }
     catch(PDOException $e) {
-      echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
+
+function getVideoLink($request,$response) {
+    $emp = json_decode($request->getBody());
+    $sql = "SELECT link  FROM videos WHERE id=:id";
+    try {
+        if (!empty($emp->id)) {
+            $db = getConnection();
+            $sth = $db->prepare($sql);
+            $sth->bindParam("id", $emp->id);
+            $sth->execute();
+            $todos = $sth->fetchAll(PDO::FETCH_OBJ);
+            return $response->withJson($todos, 200)->write();
+        }
+        else{
+            return $response->withJson("The id parameter is empty",401)->write();
+        }
+    }
+    catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+
+
 function addVideo($request,$response) {
-    global  $video_host;
+    $video_host = "http://bacalaureat.local";
     $emp = json_decode($request->getBody());
     $name = $request->getParsedBodyParam('name');
     $course = $request->getParsedBodyParam('course');
@@ -70,7 +96,7 @@ function addVideo($request,$response) {
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = moveUploadedFile($name,$directory, $uploadedFile);
             $response->write('uploaded ' . $filename . '<br/>');
-	}
+	    }
     	$video_link = $video_host . "/videos/".$filename;
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -84,35 +110,35 @@ function addVideo($request,$response) {
         $emp->id = $db->lastInsertId();
         $db = null;
         // handle single input with single file upload
-        return $response->withJson($emp,200)->write("Video successfully added");
-    } catch(PDOException $e) {
+        return $response->withJson($emp, 200)->write("Video successfully added");
+       } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }
 
-function updateVideo($request) {
-    global  $video_host;
-    $emp = json_decode($request->getBody());
-    $video_link = $video_host . "/".$emp->name;
-    $id = $request->getAttribute('id');
-    $sql = "UPDATE videos SET name=:name, course=:course link=:link, tag=:tag, date=:date WHERE id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("name", $emp->name);
-        $stmt->bindParam("course", $emp->course);
-        $stmt->bindParam("link",  $video_link);
-        $stmt->bindParam("tag", $emp->tag);
-        $stmt->bindParam("date", date("Y-m-d H:i:s"));
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($emp);
-    }
-    catch(PDOException $e) {
-       echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
-}
+//function updateVideo($request) {
+//    global  $video_host;
+//    $emp = json_decode($request->getBody());
+//    $video_link = $video_host . "/".$emp->name;
+//    $id = $request->getAttribute('id');
+//    $sql = "UPDATE videos SET name=:name, course=:course link=:link, tag=:tag, date=:date WHERE id=:id";
+//    try {
+//        $db = getConnection();
+//        $stmt = $db->prepare($sql);
+//        $stmt->bindParam("name", $emp->name);
+//        $stmt->bindParam("course", $emp->course);
+//        $stmt->bindParam("link",  $video_link);
+//        $stmt->bindParam("tag", $emp->tag);
+//        $stmt->bindParam("date", date("Y-m-d H:i:s"));
+//        $stmt->bindParam("id", $id);
+//        $stmt->execute();
+//        $db = null;
+//        echo json_encode($emp);
+//    }
+//    catch(PDOException $e) {
+//       echo '{"error":{"text":'. $e->getMessage() .'}}';
+//    }
+//}
 
 function deleteVideo($request) {
     $id = $request->getAttribute('id');
