@@ -57,7 +57,7 @@ function getVideo($request,$response) {
 
 function getVideoLink($request,$response) {
     $emp = json_decode($request->getBody());
-    $sql = "SELECT link  FROM videos WHERE id=:id";
+    $sql = "SELECT link,id  FROM videos WHERE id=:id";
     try {
         if (!empty($emp->id)) {
             $db = getConnection();
