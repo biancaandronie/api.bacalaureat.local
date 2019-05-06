@@ -27,7 +27,7 @@ function getVideos($request,$response) {
         $stmt = $db->query($sql);
         $emp = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
-        return $response->withJson($emp,200)->write();
+        return $response->withJson($emp,200);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
@@ -44,7 +44,7 @@ function getVideo($request,$response) {
             $sth->bindParam("name", $name);
             $sth->execute();
             $todos = $sth->fetchAll(PDO::FETCH_OBJ);
-            return $response->withJson($todos, 200)->write();
+            return $response->withJson($todos, 200);
         }
         else{
             return $response->withJson("The name parameter is empty",401)->write();
@@ -57,7 +57,7 @@ function getVideo($request,$response) {
 
 function getVideoLink($request,$response) {
     $emp = json_decode($request->getBody());
-    $sql = "SELECT link,id  FROM videos WHERE id=:id";
+    $sql = "SELECT *  FROM videos WHERE id=:id";
     try {
         if (!empty($emp->id)) {
             $db = getConnection();
@@ -65,10 +65,10 @@ function getVideoLink($request,$response) {
             $sth->bindParam("id", $emp->id);
             $sth->execute();
             $todos = $sth->fetchAll(PDO::FETCH_OBJ);
-            return $response->withJson($todos, 200)->write();
+            return $response->withJson($todos, 200);
         }
         else{
-            return $response->withJson("The id parameter is empty",401)->write();
+            return $response->withJson("The id parameter is empty",401);
         }
     }
     catch(PDOException $e) {
