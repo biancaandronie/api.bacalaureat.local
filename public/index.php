@@ -83,11 +83,10 @@ function addVideo($request,$response) {
     $emp = json_decode($request->getBody());
     $name = $request->getParsedBodyParam('name');
     $course = $request->getParsedBodyParam('course');
-    $tag = $request->getParsedBodyParam('tag');
     $description = $request->getParsedBodyParam('description');
-    $sql = "INSERT INTO videos (name, course, link, tag, date) VALUES (:name,:course,:link,:tag,:date)";
+    $sql = "INSERT INTO videos (name, course, link, description, date) VALUES (:name,:course,:link,:description,:date)";
     try {
-    	$directory = __DIR__ . '/videos';
+    	$directory = '../bacalaureat/public/videos';
         $uploadedFiles = $request->getUploadedFiles();
         if (empty($uploadedFiles['videofile'])) {
             throw new \RuntimeException('Expected a videofile');
@@ -103,8 +102,7 @@ function addVideo($request,$response) {
         $stmt->bindParam("name", $name);
         $stmt->bindParam("course", $course);
         $stmt->bindParam("link", $video_link);
-        $stmt->bindParam("tag", $tag);
-//        $stmt->bindParam("description", $description);
+        $stmt->bindParam("description", $description);
         $stmt->bindParam("date", date("Y-m-d H:i:s"));
         $stmt->execute();
         $emp->id = $db->lastInsertId();
@@ -160,7 +158,7 @@ function moveUploadedFile($name,$directory, UploadedFile $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
     $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
-    $filename = sprintf('%s.%0.8s', $name, $extension);
+    $filename = sprintf('%s.%0.8s', $basename, $extension);
 
     $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
 
