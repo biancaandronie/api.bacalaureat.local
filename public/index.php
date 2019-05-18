@@ -154,6 +154,42 @@ function deleteVideo($request) {
     }
 }
 
+function getComments($request,$response) {
+    $sql = "select * FROM comments";
+    try {
+        $db = getConnection();
+        $stmt = $db->query($sql);
+        $emp = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        return $response->withJson($emp,200);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function addComment($request,$response) {
+    $emp = json_decode($request->getBody());
+    $name = $request->getParsedBodyParam('name');
+    $course = $request->getParsedBodyParam('message');
+    //$description = $request->getParsedBodyParam('description');
+    $sql = "INSERT INTO comments (name, message, date) VALUES (:name,:message,:date)";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("name", $name);
+        $stmt->bindParam("message", $course);
+        $stmt->bindParam("date", date("Y-m-d H:i:s"));
+        $stmt->execute();
+        $emp->id = $db->lastInsertId();
+        $db = null;
+        // handle single input with single file upload
+        #return $response->withJson($emp, 200);
+        getComments($request,$response);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
 function moveUploadedFile($directory, UploadedFile $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);

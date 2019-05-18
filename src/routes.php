@@ -11,6 +11,8 @@ $app->group('/api', function () use ($app) {
         $app->post('/upload', 'addVideo');
 		$app->put('/update/{id}', 'updateVideo');
 		$app->delete('/delete/{id}', 'deleteVideo');
+        $app->get('/comments', 'getComments');
+        $app->post('/comment', 'addComment');
 	});
 });
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
