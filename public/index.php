@@ -93,7 +93,7 @@ function addVideo($request,$response) {
         }
         $uploadedFile = $uploadedFiles['videofile'];
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-            $filename = moveUploadedFile($name,$directory, $uploadedFile);
+            $filename = moveUploadedFile($directory, $uploadedFile);
             $response->write('uploaded ' . $filename . '<br/>');
 	    }
     	$video_link = $video_host . "/videos/".$filename;
@@ -154,7 +154,7 @@ function deleteVideo($request) {
     }
 }
 
-function moveUploadedFile($name,$directory, UploadedFile $uploadedFile)
+function moveUploadedFile($directory, UploadedFile $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
     $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
