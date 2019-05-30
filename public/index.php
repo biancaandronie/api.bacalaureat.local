@@ -114,30 +114,6 @@ function addVideo($request,$response) {
     }
 }
 
-//function updateVideo($request) {
-//    global  $video_host;
-//    $emp = json_decode($request->getBody());
-//    $video_link = $video_host . "/".$emp->name;
-//    $id = $request->getAttribute('id');
-//    $sql = "UPDATE videos SET name=:name, course=:course link=:link, tag=:tag, date=:date WHERE id=:id";
-//    try {
-//        $db = getConnection();
-//        $stmt = $db->prepare($sql);
-//        $stmt->bindParam("name", $emp->name);
-//        $stmt->bindParam("course", $emp->course);
-//        $stmt->bindParam("link",  $video_link);
-//        $stmt->bindParam("tag", $emp->tag);
-//        $stmt->bindParam("date", date("Y-m-d H:i:s"));
-//        $stmt->bindParam("id", $id);
-//        $stmt->execute();
-//        $db = null;
-//        echo json_encode($emp);
-//    }
-//    catch(PDOException $e) {
-//       echo '{"error":{"text":'. $e->getMessage() .'}}';
-//    }
-//}
-
 function deleteVideo($request) {
     $id = $request->getAttribute('id');
     $sql = "DELETE FROM videos WHERE id=:id";
@@ -155,13 +131,23 @@ function deleteVideo($request) {
 }
 
 function getComments($request,$response) {
-    $sql = "select * FROM comments";
+    $emp = json_decode($request->getBody());
+    $video_id = "$emp->video_id";
+   // $video_id = $request->getAttribute('video_id');
+    $sql = "select name,message FROM comments where video_id =:video_id ";
     try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $emp = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        return $response->withJson($emp,200);
+        if (!empty($emp->video_id)) {
+            $db = getConnection();
+            $stmt = $db->query($sql);
+            $stmt->bindParam("video_id", $video_id);
+            $stmt->execute();
+            $db = null;
+            $todos = $stmt->fetchAll(PDO::FETCH_OBJ);
+            return $response->withJson($todos, 200);
+        }
+        else {
+            return $response->withJson("The video_id parameter is empty",401);
+        }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
