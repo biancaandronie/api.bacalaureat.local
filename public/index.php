@@ -146,7 +146,7 @@ function getComments($request,$response) {
             return $response->withJson($todos, 200)->write($video_id);
         }
         else {
-            return $response->withJson("The video_id parameter is empty",401);
+            return $response->withJson("The video_id parameter is empty",201);
         }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
