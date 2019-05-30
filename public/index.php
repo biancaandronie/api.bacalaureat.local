@@ -134,7 +134,7 @@ function getComments($request,$response) {
     $emp = json_decode($request->getBody());
     $video_id = $emp->video_id;
    // $video_id = $request->getAttribute('video_id');
-    $sql = "select name,message FROM comments where video_id =:video_id ";
+    $sql = "SELECT name,message FROM comments WHERE video_id=:video_id";
     try {
         if (!empty($emp->video_id)) {
             $db = getConnection();
