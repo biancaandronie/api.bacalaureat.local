@@ -132,7 +132,7 @@ function deleteVideo($request) {
 
 function getComments($request,$response) {
     $emp = json_decode($request->getBody());
-    $video_id = "$emp->video_id";
+    $video_id = $emp->video_id;
    // $video_id = $request->getAttribute('video_id');
     $sql = "select name,message FROM comments where video_id =:video_id ";
     try {
@@ -143,7 +143,7 @@ function getComments($request,$response) {
             $stmt->execute();
             $db = null;
             $todos = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return $response->withJson($todos, 200);
+            return $response->withJson($todos, 200)->write($video_id);
         }
         else {
             return $response->withJson("The video_id parameter is empty",401);
