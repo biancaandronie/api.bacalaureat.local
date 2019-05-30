@@ -156,14 +156,16 @@ function getComments($request,$response) {
 function addComment($request,$response) {
     $emp = json_decode($request->getBody());
     $name = $request->getParsedBodyParam('name');
-    $course = $request->getParsedBodyParam('message');
+    $message = $request->getParsedBodyParam('message');
+    $video_id = $request->getParsedBodyParam('video_id');
     //$description = $request->getParsedBodyParam('description');
-    $sql = "INSERT INTO comments (name, message, date) VALUES (:name,:message,:date)";
+    $sql = "INSERT INTO comments (name,video_id, message, date) VALUES (:name,:video_id,:message,:date)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->bindParam("name", $name);
-        $stmt->bindParam("message", $course);
+        $stmt->bindParam("message", $message);
+        $stmt->bindParam("video_id", $video_id);
         $stmt->bindParam("date", date("Y-m-d H:i:s"));
         $stmt->execute();
         $emp->id = $db->lastInsertId();
