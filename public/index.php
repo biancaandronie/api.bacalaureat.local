@@ -155,9 +155,9 @@ function getComments($request,$response) {
 
 function addComment($request,$response) {
     $emp = json_decode($request->getBody());
-    $name = $request->getParsedBodyParam('name');
-    $message = $request->getParsedBodyParam('message');
-    $video_id = $request->getParsedBodyParam('video_id');
+    $name = $emp->name;
+    $message = $emp->message;
+    $video_id = $emp->video_id;
     //$description = $request->getParsedBodyParam('description');
     $sql = "INSERT INTO comments (name,video_id, message, date) VALUES (:name,:video_id,:message,:date)";
     try {
