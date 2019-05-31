@@ -140,7 +140,7 @@ function getComments($request,$response) {
             $stmt = $db->query($sql);
             //$stmt->bindParam("video_id",$video_id);
             $stmt->execute();
-            $todos = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $todos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $db = null;
             return $response->withJson($todos, 200);
         }
