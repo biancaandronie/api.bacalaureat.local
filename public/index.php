@@ -133,15 +133,15 @@ function deleteVideo($request) {
 function getComments($request,$response) {
     $emp = json_decode($request->getBody());
     $video_id = $emp->video_id;
-    $sql = "SELECT name,message FROM comments WHERE video_id=:videoid";
+    $sql = "SELECT name,message FROM comments WHERE video_id=:video_id";
     try {
         if (!empty($video_id)) {
             $db = getConnection();
             $stmt = $db->query($sql);
-            $stmt->bindParam("videoid",$video_id);
+            $stmt->bindParam("video_id",$video_id);
             $stmt->execute();
-            $db = null;
             $todos = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $db = null;
             return $response->withJson($todos, 200)->write($video_id);
         }
         else {
