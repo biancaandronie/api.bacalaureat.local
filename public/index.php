@@ -142,7 +142,7 @@ function getComments($request,$response) {
             $stmt->execute();
             $todos = $stmt->fetchAll(PDO::FETCH_OBJ);
             $db = null;
-            return $response->withJson($todos, 200)->write($video_id);
+            return $response->withJson($todos, 200);
         }
         else {
             return $response->withJson([],201)->write($video_id);
