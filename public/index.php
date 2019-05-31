@@ -132,7 +132,7 @@ function deleteVideo($request) {
 
 function getComments($request,$response) {
     $emp = json_decode($request->getBody());
-    $video_id = (int)$emp->video_id;
+    $video_id = intval($emp->video_id);
     $sql = "SELECT name,message FROM comments WHERE video_id=:video_id";
     try {
         if (!empty($video_id)) {
