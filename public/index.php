@@ -150,6 +150,7 @@ function getComments($request,$response) {
         }
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+        return $response->withJson($video_id,201);
     }
 }
 
