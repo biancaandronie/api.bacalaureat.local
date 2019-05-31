@@ -169,8 +169,9 @@ function addComment($request,$response) {
         $stmt->execute();
         $emp->id = $db->lastInsertId();
         $db = null;
+        $resp = "{ name: $emp->name, message: $emp->message}";
         // handle single input with single file upload
-        return $response->withJson($emp, 200);
+        return $response->withJson($resp, 200);
         #getComments($request,$response);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
